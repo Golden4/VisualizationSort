@@ -33,6 +33,7 @@ define(['Base/Composite'], function (Composite) {
         mount(container, position) {
             // прехук до монтирования        
             this._beforeMount();
+            this._beforeRender();
             // создаем новый компонент в доме
             const newComponent = document.createElement('div');
             // помещаем туда верстку
@@ -44,16 +45,23 @@ define(['Base/Composite'], function (Composite) {
             // меняем состояние что компонент смонтирован
             this.setState({ isMount: true });
             // прехук после монтирования
-            this._afterMount()
+            this._afterMount();
+            this._afterRender();
         }
 
         /**
          * вызываеться при необходимости обновить компонент в верстке
          * пока не реализован, обновляться будет по изменению состояния компонента
          */
+
         update() {
-            this.beforeUpdate();
-            this.afterUpdate();
+            this._beforeRender();
+            this.getContainer().innerHTML = this.renderContent(this.options, this.state);
+            this._afterRender();
+        }
+
+        renderContent(options, state) {
+
         }
 
         /**
@@ -118,14 +126,38 @@ define(['Base/Composite'], function (Composite) {
             }
         }
 
-        // прехук до обновления
-        beforeUpdate() {
+        // прехук до монтирования
+        beforeRender() {
 
         }
 
-        // прехук после обновления
-        afterUpdate() {
+        // внутренний прехук до монтирования для передачи задач по цепочки и реализации в базе
+        _beforeRender() {
+            this.beforeRender();
+            this._beforeRenderChildren();
+        }
 
+        // внутренний прехук для вызова прехуков детей
+        _beforeRenderChildren() {
+            for (let ch in this.childrens.childrens) {
+                this.childrens.childrens[ch]._beforeRender();
+            }
+        }
+
+        afterRender() {
+
+        }
+
+        // внутренний прехук для вызова прехуков детей
+        _afterRender() {
+            this.afterRender();
+            this._afterRenderChildren();
+        }
+
+        _afterRenderChildren() {
+            for (let ch in this.childrens.childrens) {
+                this.childrens.childrens[ch]._afterRender();
+            }
         }
 
         // прехук до размонтирования

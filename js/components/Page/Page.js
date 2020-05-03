@@ -6,7 +6,7 @@ define([
     'Comp/BubbleSort',
     'Comp/BinarySort',
     'css!Page/css/Page.css'
-], function (Component, Menu, Params, SorterView, BubbleSort, BinarySort) {
+], function (Component, Menu, Params) {
     'use strict';
 
     class Page extends Component {
@@ -24,28 +24,25 @@ define([
             return this.module;
         }
 
-        // mountComponentToSecondaryColumn(component, options) {
-        //     if (this.module)
-        //         this.module.unmount();
-        //     this.module = this.childrens.create(component, options);
-        //     this.module.mount(this.getContainer().querySelector('.content__secondary-column'));
-        //     return this.module;
-        // }
-
         render() {
-
-            // this.binarySort = this.childrens.create(SorterView, { sorterComponent: BinarySort, title: 'Сортировка бинарным деревом', size: 20 });
-            this.module = this.childrens.create(SorterView, { sorterComponent: BubbleSort, title: 'Сортировка пузырьком', size: 10 })
-
             return `
             <div class="page">
                         <div class="content">
                             <div class="content__main-column">
                                 ${this.childrens.create(Params, { page: this })}
-                                ${this.module}
+                                ${this.module || ''}
                             </div>
                             <div class="content__secondary-column">
                                 ${this.childrens.create(Menu, { page: this })}
+                                <div class="module">
+                                    <p class="title module__title">Инструкция</p>
+                                    <p>- Выбрать метод сортировки из меню</p>
+                                    <p>- Задать массив</p>
+                                    <p>- Нажать кнопку сортировать</p>
+                                </div>
+                                <div class="module">
+                                   © Special for Tensor by Alsynbaev F.
+                                </div>
                             </div>
                         </div>
                     </div>`;

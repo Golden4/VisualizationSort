@@ -1,7 +1,8 @@
 define([
     'Base/Component',
-    'Comp/BinaryTree'
-], function (Component, BinaryTree) {
+    'Comp/BinaryTree',
+    'Comp/NumberList'
+], function (Component, BinaryTree, NumberList) {
     'use strict';
 
     class Tree {
@@ -69,18 +70,16 @@ define([
         }
     };
 
-
     class BinarySort extends Component {
 
         constructor(options) {
             super(options);
-            this.nodes = [];
-            this.numbersVisual = [];
 
             if (this.options.numbers) {
                 this.state.numbers = this.options.numbers;
-            } else
-                this.state.numbers = Array.from({ length: 10 }, () => Math.floor(Math.random() * 40));;
+            }
+
+            this.state.numbersList = this.childrens.create(NumberList, { numbers: this.state.numbers });
         }
 
         getCanSort() {
@@ -101,184 +100,115 @@ define([
 
         setNumbers(numbers) {
             this.state.numbers = numbers;
+            this.state.numbersList.setNumbers(numbers);
             this.state.binaryTree.deleteRootNodeAndChildrens();
-            this.state.binaryTree.setState({ number: this.state.numbers[0] });
-            this.state.tree = new Tree(this.state.numbers[0], 0);
-            this.state.sorter = this.binaryTree(this.state.numbers);
         }
 
-        changeAllNodeColor(bgColor) {
-            for (let i = 0; i < this.nodes.length; i++) {
-                if (this.nodes[i].className == 'binarytree__node')
-                    this.nodes[i].style.background = bgColor;
-            }
-        }
-
-        changeNodeColor({ nodeIndex, treeLevel, bgColor }) {
-
-            const node = this.getNode(nodeIndex, treeLevel);
-            if (node.className == 'binarytree__node') {
-                node.style.background = bgColor;
-            }
-        }
-
-        changeNumColor(index, bgColor, reset = true) {
-
-            if (reset) {
-                this.resetAllColors();
-            }
-            this.numbersVisual[index].style.background = bgColor;
-        }
-
-        changeNum(index, number) {
-            this.numbersVisual[index].innerHTML = number;
-        }
-
-        resetAllColors() {
-            for (let i = 0; i < this.numbersVisual.length; i++) {
-                this.numbersVisual[i].style.background = null;
-                // this.nodes[i].style.background = null;
-            }
-        }
-
-        renderNumbers(numbers = []) {
-
-            this.numbersVisual = [];
-
-            const numbersRender = numbers.map(function (num) {
-                const div = `<div class="numbersList__number">${num}</div>`;
-
-                const htmlObject = document.createElement('div');
-                htmlObject.innerHTML = div;
-
-                return div;
-            }).join('');
-
-            return `<div class="numbersList">${numbersRender}</div>`;
-        }
-
-        renderTree(numbers = []) {
-            this.nodes = [];
-
-            this.state.binarytree = document.querySelector(".binarytree");
-            // this.state.binarytree.innerHTML = '';
-            const graphicNumbersList = document.createElement('div');
-            graphicNumbersList.className = "numbersList";
-            this.state.binarytree.append(graphicNumbersList);
-
-            graphicNumbersList.innerHTML = '';
-
-            for (let i = 0; i < numbers.length; i++) {
-                let divN = document.createElement('div');
-                divN.className = "numbersList__number";
-                divN.innerHTML = numbers[i];
-                graphicNumbersList.append(divN);
-            }
-        }
-
-        update() {
-            this.getContainer().innerHTML = this.renderContent();
-        }
-
-        renderContent() {
-
-            this.state.binaryTree = this.childrens.create(BinaryTree, { number: this.state.numbers[0], index: 0 });
-
-            return `${this.renderNumbers(numbers)}
+        renderContent(options, { numbers }) {
+            this.state.binaryTree = this.childrens.create(BinaryTree, { number: numbers[0], index: 0 });
+            return `${this.state.numbersList}
             ${this.state.binaryTree}`;
         }
 
         render(options, { numbers }) {
-
             return `
             <div class="binary-sort">
-            ${this.renderContent()}
+            ${this.renderContent(options, { numbers })}
             </div>`;
         }
 
-        afterMount() {
-            this.numbersVisual = this.getContainer().querySelectorAll('.numbersList__number');
-        }
-
-        onTick(self) {
-            if (self.state.sorter) {
-                const generatorValue = self.state.sorter.next();
+        onTick() {
+            if (this.state.sorter) {
+                const generatorValue = this.state.sorter.next();
                 if (generatorValue.value) {
                     if (generatorValue.value.operationType == 1) {
                         if (generatorValue.value.init) {
-                            self.changeNumColor(generatorValue.value.numIndex, 'yellow');
-                            self.state.curNode = self.state.binaryTree.getRootNode();
-                            self.state.binaryTree.resetChildrens();
-                            self.state.curNode.setStyle('background: yellow');
+                            this.state.numbersList.changeNumColor(generatorValue.value.numIndex, 'yellow');
+                            this.state.curNode = this.state.binaryTree.getRootNode();
+                            this.state.binaryTree.resetChildrens();
+                            this.state.curNode.setStyle('background: yellow');
                         } else {
                             if (generatorValue.value.key) {
                                 if (generatorValue.value.right) {
-                                    self.state.curNode = self.state.curNode.setRightNode(generatorValue.value.key);
-                                    if (self.state.curNode)
-                                        self.state.curNode.setStyle('background: red');
+                                    if (this.state.curNode) {
+                                        this.state.curNode = this.state.curNode.setRightNode(generatorValue.value.key);
+                                        if (this.state.curNode)
+                                            this.state.curNode.setStyle('background: red');
+                                    }
                                 }
                                 if (generatorValue.value.left) {
-                                    self.state.curNode = self.state.curNode.setLeftNode(generatorValue.value.key);
-                                    if (self.state.curNode)
-                                        self.state.curNode.setStyle('background: red');
+                                    if (this.state.curNode) {
+                                        this.state.curNode = this.state.curNode.setLeftNode(generatorValue.value.key);
+                                        if (this.state.curNode)
+                                            this.state.curNode.setStyle('background: red');
+                                    }
                                 }
                             } else {
                                 if (generatorValue.value.right) {
-                                    self.state.curNode = self.state.curNode.getRightNode();
-                                    if (self.state.curNode)
-                                        self.state.curNode.setStyle('background: yellow');
+                                    if (this.state.curNode) {
+                                        this.state.curNode = this.state.curNode.getRightNode();
+                                        if (this.state.curNode)
+                                            this.state.curNode.setStyle('background: yellow');
+                                    }
                                 }
 
                                 if (generatorValue.value.left) {
-                                    self.state.curNode = self.state.curNode.getLeftNode();
-                                    if (self.state.curNode)
-                                        self.state.curNode.setStyle('background: yellow');
+                                    if (this.state.curNode) {
+                                        this.state.curNode = this.state.curNode.getLeftNode();
+                                        if (this.state.curNode)
+                                            this.state.curNode.setStyle('background: yellow');
+                                    }
                                 }
                             }
-                            self.state.binaryTree.update();
+                            this.state.binaryTree.update();
                         }
                     }
 
                     if (generatorValue.value.operationType == 2) {
                         if (generatorValue.value.init) {
-                            self.state.curNode = self.state.binaryTree.getRootNode();
-                            self.state.binaryTree.resetChildrens();
-                            self.state.curNode.setStyle('background: orange');
-                            self.state.curNumberIndex = 0;
+                            this.state.curNode = this.state.binaryTree.getRootNode();
+                            this.state.binaryTree.resetChildrens();
+                            this.state.curNode.setStyle('background: orange');
+                            this.state.curNumberIndex = 0;
                         } else {
                             if (generatorValue.value.goParent) {
-                                self.state.curNode = self.state.curNode.getParentNode();
+                                if (this.state.curNode)
+                                    this.state.curNode = this.state.curNode.getParentNode();
                             }
 
                             if (generatorValue.value.left) {
-                                self.state.curNode = self.state.curNode.getLeftNode();
-                                if (self.state.curNode)
-                                    self.state.curNode.setStyle('background: orange');
-                            }
-
-                            if (generatorValue.value.key) {
-                                self.changeNum(self.state.curNumberIndex, self.state.curNode.state.number);
-                                self.changeNumColor(self.state.curNumberIndex, '#00f400', false);
-                                if (self.state.curNode)
-                                    self.state.curNode.setStyle('background: #00f400');
-                                self.state.curNumberIndex++;
+                                if (this.state.curNode) {
+                                    this.state.curNode = this.state.curNode.getLeftNode();
+                                    if (this.state.curNode)
+                                        this.state.curNode.setStyle('background: orange');
+                                }
                             }
 
                             if (generatorValue.value.right) {
-                                self.state.curNode = self.state.curNode.getRightNode();
-                                if (self.state.curNode)
-                                    self.state.curNode.setStyle('background: orange');
+                                if (this.state.curNode) {
+                                    this.state.curNode = this.state.curNode.getRightNode();
+                                    if (this.state.curNode)
+                                        this.state.curNode.setStyle('background: orange');
+                                }
+                            }
 
+                            if (generatorValue.value.key) {
+                                if (this.state.curNode) {
+                                    this.state.numbersList.changeNum(this.state.curNumberIndex, this.state.curNode.state.number);
+                                    this.state.curNode.setStyle('background: #00f400');
+                                }
+                                this.state.numbersList.changeNumColor(this.state.curNumberIndex, '#00f400', false);
+                                this.state.curNumberIndex++;
                             }
                         }
 
-                        self.state.binaryTree.update();
+                        this.state.binaryTree.update();
                     }
                 }
 
                 if (generatorValue.done) {
                     console.log('done');
-                    self.changeAllNodeColor('#00f400');
+                    this.onStopSort();
                     return false;
                 }
             }
@@ -286,12 +216,13 @@ define([
             return true;
         }
 
-
         onStartSort() {
-            this.state.binaryTree.deleteRootNodeAndChildrens();
-            this.state.binaryTree.setState({ number: this.state.numbers[0] });
-            this.state.tree = new Tree(this.state.numbers[0], 0);
-            this.state.sorter = this.binaryTree(this.state.numbers);
+            if (!this.state.tree) {
+                this.state.binaryTree.deleteRootNodeAndChildrens();
+                this.state.binaryTree.setState({ number: this.state.numbers[0] });
+                this.state.tree = new Tree(this.state.numbers[0], 0);
+                this.state.sorter = this.binaryTree(this.state.numbers);
+            }
         }
 
         onStopSort() {

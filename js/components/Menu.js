@@ -7,37 +7,49 @@ define([
 
         constructor(options) {
             super(options);
+            this.state.navLinks = [{
+                linkTitle: 'Пузырьком',
+                pathComponent: 'Comp/BubbleSort',
+                titleComponent: 'Сортировка пузырьком'
+            },
+            {
+                linkTitle: 'Бинарным деревом',
+                pathComponent: 'Comp/BinarySort',
+                titleComponent: 'Сортировка бинарным деревом'
+            }];
+
+            this.state.curActiveLink = 0;
         }
 
         afterMount() {
             const list = this.getContainer().querySelectorAll('.nav__link');
 
             for (let i = 0; i < list.length; i++) {
-                this.subscribeTo(list[i], 'click', this.clickList.bind(this, i));
+                this.subscribeTo(list[i], 'click', this.linkBtn.bind(this, i));
             }
+
+            this.linkBtn(this.state.curActiveLink);
         }
 
-        clickList(index) {
-            const listComponents = ['Comp/BubbleSort', 'Comp/BinarySort'];
+        linkBtn(index) {
+            this.state.curActiveLink = index;
 
-            const sa = function (SorterView, comp) {
-                console.log(this);
-                this.options.page.mountComponentToMainColumn(SorterView, { sorterComponent: comp, title: 'Сортировка пузырьком', size: 10 });
+            const afterLoadComponents = function (SorterView, component) {
+                this.options.page.mountComponentToMainColumn(SorterView, { sorterComponent: component, title: this.state.navLinks[index].titleComponent });
             }.bind(this);
 
-            requirejs(['SorterView', listComponents[index]], sa);
+            requirejs(['SorterView', this.state.navLinks[index].pathComponent], afterLoadComponents);
         }
 
         render() {
             return `<div class="nav module">
                 <p class="title module__title">Методы сортировки</p>
                 <ul class="nav__list">
-                    <li class="nav__link">
-                        <a href="#">Пузырьком</a>
-                    </li>
-                    <li class="nav__link">
-                        <a href="#">Бинарным деревом</a>
-                    </li>
+                ${this.state.navLinks.map((link) => {
+                return `<li class="nav__link">
+                        <a href="#">${link.linkTitle}</a>
+                    </li>`
+            }).join('')}
                 </ul>
             </div>`;
         }

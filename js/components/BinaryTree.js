@@ -29,18 +29,18 @@ define([
         }
 
         update() {
-            this.getContainer().innerHTML = this.renderContent();
+            this.getContainer().innerHTML = this.renderContent(this.options, this.state);
         }
 
         setLeftNode(number, index) {
             this.state.leftNode = this.childrens.create(TreeNode, { number, index, binaryTree: this.state.binaryTree, parentNode: this });
-            this.state.leftNode.mount(this.getContainer());
+            // this.state.leftNode.mount(this.getContainer());
             return this.state.leftNode;
         }
 
         setRightNode(number, index) {
             this.state.rightNode = this.childrens.create(TreeNode, { number, index, binaryTree: this.state.binaryTree, parentNode: this });
-            this.state.rightNode.mount(this.getContainer());
+            // this.state.rightNode.mount(this.getContainer());
 
             return this.state.rightNode;
         }
@@ -53,7 +53,7 @@ define([
             this.state.style = '';
         }
 
-        renderContent() {
+        renderContent(options, state) {
             if (this.state.binaryTree.needResetChildren)
                 this.reset();
 
@@ -90,9 +90,9 @@ define([
                 ${childrenNodesRender}`;
         }
 
-        render(options) {
+        render(options, state) {
             return `<div class="binary-tree__nodes">
-                ${this.renderContent()}
+                ${this.renderContent(options, state)}
             </div>`;
         }
     }
@@ -126,7 +126,6 @@ define([
 
         createRootNode() {
             this.treeNode = this.childrens.create(TreeNode, { number: this.state.number, index: this.state.index, binaryTree: this });
-            this.treeNode.mount(this.getContainer());
         }
 
         update() {

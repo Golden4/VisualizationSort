@@ -41,6 +41,12 @@ textarea { resize: vertical; }
     grid-column-end: 3;
 }
 
+.visualization .numbersList{
+    margin-left: 35px;
+    width: auto;
+    margin-top: 10px;
+}
+
 
 .graphic{
     display: grid;
@@ -63,8 +69,9 @@ textarea { resize: vertical; }
     width: 100%;
     margin: 0 5px;
     flex-shrink: 1;
-    background: rgb(57,0,214);
+    background: rgba(0,212,255,1);
     background: linear-gradient(15deg, rgba(57,0,214,1) 0%, rgba(0,212,255,1) 100%);
+    transition: background-color 0.3s;
 }
 .graphic__maxNum{
     justify-self:start;
@@ -91,6 +98,7 @@ textarea { resize: vertical; }
     line-height: 30px;
     background-color: rgb(221, 248, 255);
     border-radius: 5px;
+    transition: background 0.3s;
 }
 
 .params__field{
@@ -102,38 +110,17 @@ textarea { resize: vertical; }
 .params__button{
     text-align: center;
 }
+.params__intervals{
+    display: grid;
+    grid-template-columns: 70px 70px;
+    grid-gap: 5px;
+}
 
 .binary-sort{
     display: flex;
     flex-direction: column;
     grid-gap: 15px 5px;
 }
-
-/* .binarytree{
-    display: flex;
-    flex-direction: column;
-}
-.binarytree__field{
-    display: flex;
-    justify-content:space-around;
-    margin: 5px 0;
-}
-.binarytree__node{
-    width: 40px;
-    height: 40px;
-    background-color: rgb(221, 248, 255);
-    border: 1px solid #000;
-    display: flex;
-    justify-content:center;
-    align-items: center;
-    margin: 5px 25px;
-}
-
-.binarytree__nodeHidden{
-    width: 41px;
-    height: 41px;
-    margin: 5px 25px;
-} */
 
 .binary-tree{
     border: 1px solid #000;
@@ -151,6 +138,7 @@ textarea { resize: vertical; }
 .binary-tree__node{
     max-width: 30px;
     height: 30px;
+    transition: background 0.3s;
     background-color: rgb(221, 248, 255);
     border: 1px solid #000;
     display: flex;
@@ -177,8 +165,8 @@ textarea { resize: vertical; }
     /* background-color: aqua; */
     padding: 10px;
     border-radius: 5px;
-    
     background-color: rgb(246, 246, 246);
+    transition: background 0.3s;
     cursor: pointer;
 }
 .nav__link:hover{
@@ -189,4 +177,3 @@ textarea { resize: vertical; }
     text-decoration: none;
     color: black;
 }
-
